@@ -12,7 +12,7 @@ import {
   FormErrorMessage,
   Flex,
 } from "@chakra-ui/react";
-
+import logo from "../assets/logo.png";
 import { useNavigate } from "react-router-dom";
 interface LoginFormProps {
   onSubmit: (data: { email: string; password: string }) => void;
@@ -58,7 +58,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSubmit }) => {
       <Box w="600px" bg="white" p={10} borderRadius="lg" boxShadow="xl">
         <Flex justify="center" mb={6}>
           <Image
-            src="../assets/logo.png"
+            src={logo}
             alt="Logo"
             boxSize="120px"
             objectFit="contain"
@@ -122,7 +122,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSubmit }) => {
             </FormControl>
 
             <Button
-              onClick={() => navigate("/user-admin")}
+              onClick={() => navigate("/home")}
               colorScheme="green"
               size="lg"
               width="full"

@@ -3,6 +3,7 @@ import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import UserAdmin from "./pages/UserAdmin";
+import Metrics from "./pages/Metrics";
 import LayoutWithSidebar from "./components/LayoutWithSidebar";
 
 export default function App() {
@@ -10,7 +11,10 @@ export default function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Navigate to="/login" />} />
-        <Route path="/login" element={<Login onSubmit={(data) => console.log(data)} />} />
+        <Route
+          path="/login"
+          element={<Login onSubmit={(data) => console.log(data)} />}
+        />
 
         {/* Layout con sidebar */}
         <Route path="/" element={<LayoutWithSidebar />}>
@@ -20,6 +24,7 @@ export default function App() {
             element={<Register onSubmit={(data) => console.log(data)} />}
           />
           <Route path="user-admin" element={<UserAdmin />} />
+          <Route path="metrics" element={<Metrics />} />
           {/* Más rutas protegidas con sidebar acá */}
         </Route>
       </Routes>

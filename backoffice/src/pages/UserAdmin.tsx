@@ -13,8 +13,6 @@ import {
   Flex,
 } from "@chakra-ui/react";
 
-import Sidebar from "../components/Sidebar";
-
 interface User {
   id: number;
   name: string;
@@ -48,9 +46,16 @@ const UserAdmin: React.FC = () => {
   };
 
   return (
-    <Flex>
-      <Sidebar />
-      <Box ml="250px" p={10} minH="100vh" bg="gray.50" w="full">
+    <Flex minH="100vh" w="100vw" align="centlr" justify="flex-start" bg="gray.100">
+      <Box
+        p={10}
+        minH="100vh"
+        bg="gray.50"
+        w="full"
+        maxW="1000px"
+        borderRadius="md"
+        boxShadow="lg"
+      >
         <Heading mb={6}>Administración de Usuarios</Heading>
         <Table variant="simple" bg="white" borderRadius="md" boxShadow="md">
           <Thead bg="gray.100">

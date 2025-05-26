@@ -51,7 +51,7 @@ const Register: React.FC<RegisterProps> = ({ onSubmit }) => {
   };
 
   return (
-    <Flex minH="100vh" w="100vw" align="center" justify="center" bg="gray.100">
+    <Flex minH="90vh" w="75vw" align="center" justify="center" bg="gray.100">
       <Box w="600px" bg="white" p={10} borderRadius="lg" boxShadow="xl">
         <Heading size="lg" textAlign="center" mb={2}>
           Register
