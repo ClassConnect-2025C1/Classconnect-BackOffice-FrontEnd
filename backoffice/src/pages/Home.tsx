@@ -1,4 +1,3 @@
-import React from "react";
 import { Box, Heading, Text, VStack, HStack, Icon,Flex } from "@chakra-ui/react";
 import { MdDashboard, MdPeople, MdPersonAdd, MdBarChart } from "react-icons/md";
 
