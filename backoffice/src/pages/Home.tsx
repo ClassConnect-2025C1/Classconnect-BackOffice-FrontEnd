@@ -7,7 +7,7 @@ const Home = () => {
       <Box p={10} bg="gray.100" height="100%" width="150%">
         <Heading mb={6}>Welcome back!</Heading>
         <Text fontSize="lg" mb={8} color="gray.700">
-          Here is a quick overview of what you can do:
+          Here is a quick overview of what you can do!:
         </Text>
 
         <VStack
