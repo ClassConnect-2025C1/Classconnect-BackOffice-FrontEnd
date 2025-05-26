@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import {
   Box,
   Button,
@@ -11,35 +11,36 @@ import {
   FormLabel,
   FormErrorMessage,
   Flex,
-} from '@chakra-ui/react';
+} from "@chakra-ui/react";
 
-
+import { useNavigate } from "react-router-dom";
 interface LoginFormProps {
   onSubmit: (data: { email: string; password: string }) => void;
 }
 
 const LoginForm: React.FC<LoginFormProps> = ({ onSubmit }) => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [emailError, setEmailError] = useState('');
-  const [passwordError, setPasswordError] = useState('');
+  const navigate = useNavigate();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [emailError, setEmailError] = useState("");
+  const [passwordError, setPasswordError] = useState("");
 
   const validate = () => {
     let valid = true;
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
     if (!emailRegex.test(email)) {
-      setEmailError('Email is invalid');
+      setEmailError("Email is invalid");
       valid = false;
     } else {
-      setEmailError('');
+      setEmailError("");
     }
 
     if (password.length < 4) {
-      setPasswordError('Password must be at least 4 characters');
+      setPasswordError("Password must be at least 4 characters");
       valid = false;
     } else {
-      setPasswordError('');
+      setPasswordError("");
     }
 
     return valid;
@@ -53,20 +54,8 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSubmit }) => {
   };
 
   return (
-    <Flex
-      minH="100vh"
-      w="100vw"
-      align="center"
-      justify="center"
-      bg="gray.100"
-    >
-      <Box
-        w="600px"
-        bg="white"
-        p={10}
-        borderRadius="lg"
-        boxShadow="xl"
-      >
+    <Flex minH="100vh" w="100vw" align="center" justify="center" bg="gray.100">
+      <Box w="600px" bg="white" p={10} borderRadius="lg" boxShadow="xl">
         <Flex justify="center" mb={6}>
           <Image
             src="../assets/logo.png"
@@ -95,12 +84,15 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSubmit }) => {
                 value={email}
                 onChange={(e) => {
                   setEmail(e.target.value);
-                  if (emailError) setEmailError('');
+                  if (emailError) setEmailError("");
                 }}
                 bg="gray.50"
                 borderColor="gray.300"
-                _focus={{ borderColor: '#4CAF50', boxShadow: '0 0 0 1px #4CAF50' }}
-                aria-describedby={emailError ? 'email-error' : undefined}
+                _focus={{
+                  borderColor: "#4CAF50",
+                  boxShadow: "0 0 0 1px #4CAF50",
+                }}
+                aria-describedby={emailError ? "email-error" : undefined}
               />
               <FormErrorMessage id="email-error">{emailError}</FormErrorMessage>
             </FormControl>
@@ -114,18 +106,23 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSubmit }) => {
                 value={password}
                 onChange={(e) => {
                   setPassword(e.target.value);
-                  if (passwordError) setPasswordError('');
+                  if (passwordError) setPasswordError("");
                 }}
                 bg="gray.50"
                 borderColor="gray.300"
-                _focus={{ borderColor: '#4CAF50', boxShadow: '0 0 0 1px #4CAF50' }}
-                aria-describedby={passwordError ? 'password-error' : undefined}
+                _focus={{
+                  borderColor: "#4CAF50",
+                  boxShadow: "0 0 0 1px #4CAF50",
+                }}
+                aria-describedby={passwordError ? "password-error" : undefined}
               />
-              <FormErrorMessage id="password-error">{passwordError}</FormErrorMessage>
+              <FormErrorMessage id="password-error">
+                {passwordError}
+              </FormErrorMessage>
             </FormControl>
 
             <Button
-              type="submit"
+              onClick={() => navigate("/user-admin")}
               colorScheme="green"
               size="lg"
               width="full"
