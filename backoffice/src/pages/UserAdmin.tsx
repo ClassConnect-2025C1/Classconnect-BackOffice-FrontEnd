@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import {
   Box,
   Heading,
@@ -11,7 +11,7 @@ import {
   Button,
   useToast,
   Flex,
-} from '@chakra-ui/react';
+} from "@chakra-ui/react";
 
 import Sidebar from "../components/Sidebar";
 
@@ -23,9 +23,9 @@ interface User {
 }
 
 const mockUsers: User[] = [
-  { id: 1, name: 'Juan Pérez', email: 'juan@example.com', isBlocked: false },
-  { id: 2, name: 'Ana Gómez', email: 'ana@example.com', isBlocked: true },
-  { id: 3, name: 'Carlos Ruiz', email: 'carlos@example.com', isBlocked: false },
+  { id: 1, name: "Juan Pérez", email: "juan@example.com", isBlocked: false },
+  { id: 2, name: "Ana Gómez", email: "ana@example.com", isBlocked: true },
+  { id: 3, name: "Carlos Ruiz", email: "carlos@example.com", isBlocked: false },
 ];
 
 const UserAdmin: React.FC = () => {
@@ -35,13 +35,13 @@ const UserAdmin: React.FC = () => {
   const toggleBlock = (id: number) => {
     setUsers((prev) =>
       prev.map((user) =>
-        user.id === id ? { ...user, isBlocked: !user.isBlocked } : user
-      )
+        user.id === id ? { ...user, isBlocked: !user.isBlocked } : user,
+      ),
     );
     const user = users.find((u) => u.id === id);
     toast({
-      title: user?.isBlocked ? 'Usuario desbloqueado' : 'Usuario bloqueado',
-      status: 'info',
+      title: user?.isBlocked ? "Usuario desbloqueado" : "Usuario bloqueado",
+      status: "info",
       duration: 2000,
       isClosable: true,
     });
@@ -68,14 +68,14 @@ const UserAdmin: React.FC = () => {
                 <Td>{user.id}</Td>
                 <Td>{user.name}</Td>
                 <Td>{user.email}</Td>
-                <Td>{user.isBlocked ? 'Bloqueado' : 'Activo'}</Td>
+                <Td>{user.isBlocked ? "Bloqueado" : "Activo"}</Td>
                 <Td>
                   <Button
-                    colorScheme={user.isBlocked ? 'green' : 'red'}
+                    colorScheme={user.isBlocked ? "green" : "red"}
                     size="sm"
                     onClick={() => toggleBlock(user.id)}
                   >
-                    {user.isBlocked ? 'Desbloquear' : 'Bloquear'}
+                    {user.isBlocked ? "Desbloquear" : "Bloquear"}
                   </Button>
                 </Td>
               </Tr>

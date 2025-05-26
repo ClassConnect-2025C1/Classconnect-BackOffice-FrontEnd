@@ -1,4 +1,4 @@
-import { Box, VStack, Button, Image, Text, HStack } from "@chakra-ui/react";
+import { Box, VStack, Button, Image, Text } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
 import logo from "../assets/logo.png";
 import { MdHome, MdPeople, MdPersonAdd, MdBarChart } from "react-icons/md";
@@ -31,7 +31,7 @@ const Sidebar = () => {
           _hover={{ bg: "#276749" }}
           justifyContent="flex-start"
           leftIcon={<MdHome size="20px" />}
-          onClick={() => navigate("/")}
+          onClick={() => navigate("/home")}
         >
           Home
         </Button>
@@ -53,7 +53,7 @@ const Sidebar = () => {
           _hover={{ bg: "#276749" }}
           justifyContent="flex-start"
           leftIcon={<MdPersonAdd size="20px" />}
-          onClick={() => navigate("/create-admin")}
+          onClick={() => navigate("/register")}
         >
           Create Admin
         </Button>
