@@ -10,7 +10,7 @@ export default function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Navigate to="/login" />} />
-        <Route path="/login" element={<Login />} />
+        <Route path="/login" element={<Login onSubmit={(data) => console.log(data)} />} />
 
         {/* Layout con sidebar */}
         <Route path="/" element={<LayoutWithSidebar />}>
