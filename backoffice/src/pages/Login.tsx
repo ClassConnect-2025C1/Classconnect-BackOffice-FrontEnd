@@ -46,12 +46,31 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSubmit }) => {
     return valid;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (validate()) {
-      onSubmit({ email, password });
+const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
+  if (validate()) {
+    try {
+      const response = await fetch("https://classconnect-backoffice-service-api.onrender.com/admin/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Credenciales inválidas");
+      }
+
+      const data = await response.json();
+      // Aquí puedes guardar el token recibido y redirigir al usuario
+      navigate("/home");
+    } catch (error) {
+      // Manejo de errores, por ejemplo, mostrar un mensaje al usuario
+      console.error(error);
     }
-  };
+  }
+};
 
   return (
     <Flex minH="100vh" w="100vw" align="center" justify="center" bg="gray.100">
@@ -122,7 +141,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSubmit }) => {
             </FormControl>
 
             <Button
-              onClick={() => navigate("/home")}
+              type="submit"
               colorScheme="green"
               size="lg"
               width="full"
