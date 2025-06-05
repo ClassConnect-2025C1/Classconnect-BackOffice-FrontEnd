@@ -11,15 +11,25 @@ import {
   FormLabel,
   FormErrorMessage,
   Flex,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+  ModalCloseButton,
+  useDisclosure,
 } from "@chakra-ui/react";
 import logo from "../assets/logo.png";
 import { useNavigate } from "react-router-dom";
+
 interface LoginFormProps {
   onSubmit: (data: { email: string; password: string }) => void;
 }
 
 const LoginForm: React.FC<LoginFormProps> = ({ onSubmit }) => {
   const navigate = useNavigate();
+  const { isOpen, onOpen, onClose } = useDisclosure();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [emailError, setEmailError] = useState("");
@@ -46,31 +56,34 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSubmit }) => {
     return valid;
   };
 
-const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault();
-  if (validate()) {
-    try {
-      const response = await fetch("https://classconnect-backoffice-service-api.onrender.com/admin/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email, password }),
-      });
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (validate()) {
+      try {
+        const response = await fetch("https://classconnect-backoffice-service-api.onrender.com/admin/login", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ email, password }),
+        });
 
-      if (!response.ok) {
-        throw new Error("Credenciales inválidas");
+        if (!response.ok) {
+          throw new Error("Credenciales inválidas");
+        }
+        const token = response.headers.get("Authorization");
+        if (token) {
+          localStorage.setItem("token", token);
+        }
+        const data = await response.json();
+        // Aquí puedes guardar el token recibido y redirigir al usuario
+        navigate("/home");
+      } catch (error) {
+        // Manejo de errores, por ejemplo, mostrar un mensaje al usuario
+        onOpen(); // Mostrar el modal de error
       }
-
-      const data = await response.json();
-      // Aquí puedes guardar el token recibido y redirigir al usuario
-      navigate("/home");
-    } catch (error) {
-      // Manejo de errores, por ejemplo, mostrar un mensaje al usuario
-      console.error(error);
     }
-  }
-};
+  };
 
   return (
     <Flex minH="100vh" w="100vw" align="center" justify="center" bg="gray.100">
@@ -152,6 +165,23 @@ const handleSubmit = async (e: React.FormEvent) => {
           </VStack>
         </form>
       </Box>
+
+      {/* Modal de error de autenticación */}
+      <Modal isOpen={isOpen} onClose={onClose} isCentered>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>Error de autenticación</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            Las credenciales ingresadas no son válidas. Por favor, verifica tu correo electrónico y contraseña.
+          </ModalBody>
+          <ModalFooter>
+            <Button colorScheme="red" mr={3} onClick={onClose}>
+              Cerrar
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
     </Flex>
   );
 };
