@@ -1,8 +1,4 @@
-// Función para probar con credenciales de ejemplo
-  const handleTestLogin = () => {
-    setEmail("admin@example.com");
-    setPassword("admin1234");
-  };import React, { useState } from "react";
+import React, { useState } from "react";
 import {
   Box,
   Button,
@@ -306,16 +302,6 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSubmit }) => {
               Log in
             </Button>
 
-            {/* Botón para pruebas (opcional - puedes removerlo en producción) */}
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleTestLogin}
-              disabled={isLoading}
-              colorScheme="gray"
-            >
-              Usar credenciales de prueba
-            </Button>
           </VStack>
         </form>
       </Box>
@@ -343,9 +329,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSubmit }) => {
             <Button colorScheme="red" mr={3} onClick={onClose}>
               Cerrar
             </Button>
-            <Button variant="outline" onClick={() => { handleTestLogin(); onClose(); }}>
-              Usar credenciales de prueba
-            </Button>
+
           </ModalFooter>
         </ModalContent>
       </Modal>
