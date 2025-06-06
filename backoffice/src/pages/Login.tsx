@@ -1,4 +1,8 @@
-import React, { useState } from "react";
+// Función para probar con credenciales de ejemplo
+  const handleTestLogin = () => {
+    setEmail("admin@example.com");
+    setPassword("admin1234");
+  };import React, { useState } from "react";
 import {
   Box,
   Button,
@@ -41,6 +45,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSubmit }) => {
   const [passwordError, setPasswordError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [loginError, setLoginError] = useState("");
+
 
   const validate = () => {
     let valid = true;
@@ -85,6 +90,8 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSubmit }) => {
       if (!response.ok) {
         if (response.status === 401) {
           throw new Error("Credenciales inválidas");
+        } else if (response.status === 404) {
+          throw new Error("Endpoint no encontrado - Verifica que el servidor esté activo");
         } else if (response.status === 500) {
           throw new Error("Error interno del servidor");
         } else {
@@ -92,16 +99,55 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSubmit }) => {
         }
       }
 
-      // Obtener token del header Authorization
-      const token = response.headers.get("Authorization");
-      if (token) {
-        localStorage.setItem("token", token);
-        console.log("Token guardado:", token);
+      // Obtener datos del body
+      const data = await response.json();
+
+      // Buscar el token en diferentes lugares
+      let token = null;
+
+      // 1. Buscar en header Authorization
+      const tokenFromHeader = response.headers.get("Authorization");
+      if (tokenFromHeader) {
+        token = tokenFromHeader;
+      }
+      // 2. Buscar en header authorization (minúscula)
+      else {
+        const tokenFromAuth = response.headers.get("authorization");
+        if (tokenFromAuth) {
+          token = tokenFromAuth;
+        }
+        // 3. Buscar en el body
+        else if (data.token) {
+          token = data.token;
+        }
+        else if (data.accessToken) {
+          token = data.accessToken;
+        }
+        else if (data.access_token) {
+          token = data.access_token;
+        }
+        else if (data.authToken) {
+          token = data.authToken;
+        }
+        else if (data.jwt) {
+          token = data.jwt;
+        }
+        // 4. Buscar en data.data (por si está anidado)
+        else if (data.data && data.data.token) {
+          token = data.data.token;
+        }
+        // 5. Buscar en data.user (por si está en el objeto user)
+        else if (data.user && data.user.token) {
+          token = data.user.token;
+        }
       }
 
-      // Obtener datos de respuesta si los hay
-      const data = await response.json();
-      console.log("Login exitoso:", data);
+      if (token) {
+        // Asegurar que el token tenga el formato Bearer si no lo tiene
+        const finalToken = token.startsWith('Bearer ') ? token : `Bearer ${token}`;
+        localStorage.setItem("token", finalToken);
+        console.log("Token guardado exitosamente");
+      }
 
       // Mostrar notificación de éxito
       toast({
@@ -131,6 +177,16 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSubmit }) => {
       if (errorMessage.includes("Credenciales inválidas")) {
         setLoginError("Las credenciales ingresadas no son válidas");
         onOpen(); // Mostrar modal de error
+      } else if (errorMessage.includes("Endpoint no encontrado")) {
+        setLoginError("El servidor no está disponible o el endpoint no existe");
+        toast({
+          title: "Servidor no disponible",
+          description: "El servidor puede estar inactivo. Los servicios gratuitos de Render se duermen después de inactividad.",
+          status: "error",
+          duration: 8000,
+          isClosable: true,
+          position: "top-right",
+        });
       } else if (errorMessage.includes("Failed to fetch")) {
         setLoginError("Error de conexión. Verifica tu conexión a internet.");
         toast({
@@ -155,12 +211,6 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSubmit }) => {
     } finally {
       setIsLoading(false);
     }
-  };
-
-  // Función para probar con credenciales de ejemplo
-  const handleTestLogin = () => {
-    setEmail("admin@example.com");
-    setPassword("admin1234");
   };
 
   return (
