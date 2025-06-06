@@ -19,21 +19,28 @@ import {
   ModalFooter,
   ModalCloseButton,
   useDisclosure,
+  useToast,
+  Alert,
+  AlertIcon,
+  AlertDescription,
 } from "@chakra-ui/react";
 import logo from "../assets/logo.png";
 import { useNavigate } from "react-router-dom";
 
 interface LoginFormProps {
-  onSubmit: (data: { email: string; password: string }) => void;
+  onSubmit?: (data: { email: string; password: string }) => void;
 }
 
 const LoginForm: React.FC<LoginFormProps> = ({ onSubmit }) => {
   const navigate = useNavigate();
+  const toast = useToast();
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [emailError, setEmailError] = useState("");
   const [passwordError, setPasswordError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [loginError, setLoginError] = useState("");
 
   const validate = () => {
     let valid = true;
@@ -58,31 +65,102 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSubmit }) => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (validate()) {
-      try {
-        const response = await fetch("https://classconnect-backoffice-service-api.onrender.com/admin/login", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ email, password }),
-        });
-
-        if (!response.ok) {
-          throw new Error("Credenciales inválidas");
-        }
-        const token = response.headers.get("Authorization");
-        if (token) {
-          localStorage.setItem("token", token);
-        }
-        const data = await response.json();
-        // Aquí puedes guardar el token recibido y redirigir al usuario
-        navigate("/home");
-      } catch (error) {
-        // Manejo de errores, por ejemplo, mostrar un mensaje al usuario
-        onOpen(); // Mostrar el modal de error
-      }
+    setLoginError(""); // Limpiar errores previos
+    
+    if (!validate()) {
+      return;
     }
+
+    setIsLoading(true);
+
+    try {
+      const response = await fetch("https://classconnect-backoffice-service-api.onrender.com/admin/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password }),
+      });
+
+      if (!response.ok) {
+        if (response.status === 401) {
+          throw new Error("Credenciales inválidas");
+        } else if (response.status === 500) {
+          throw new Error("Error interno del servidor");
+        } else {
+          throw new Error(`Error ${response.status}: ${response.statusText}`);
+        }
+      }
+
+      // Obtener token del header Authorization
+      const token = response.headers.get("Authorization");
+      if (token) {
+        localStorage.setItem("token", token);
+        console.log("Token guardado:", token);
+      }
+
+      // Obtener datos de respuesta si los hay
+      const data = await response.json();
+      console.log("Login exitoso:", data);
+
+      // Mostrar notificación de éxito
+      toast({
+        title: "Login exitoso",
+        description: "Bienvenido al panel de administración",
+        status: "success",
+        duration: 3000,
+        isClosable: true,
+        position: "top-right",
+      });
+
+      // Ejecutar callback si se proporciona
+      if (onSubmit) {
+        onSubmit({ email, password });
+      }
+
+      // Redirigir al home después de un breve delay
+      setTimeout(() => {
+        navigate("/home");
+      }, 1000);
+
+    } catch (error) {
+      console.error("Error en login:", error);
+      
+      const errorMessage = error instanceof Error ? error.message : "Error desconocido";
+      
+      if (errorMessage.includes("Credenciales inválidas")) {
+        setLoginError("Las credenciales ingresadas no son válidas");
+        onOpen(); // Mostrar modal de error
+      } else if (errorMessage.includes("Failed to fetch")) {
+        setLoginError("Error de conexión. Verifica tu conexión a internet.");
+        toast({
+          title: "Error de conexión",
+          description: "No se pudo conectar con el servidor",
+          status: "error",
+          duration: 5000,
+          isClosable: true,
+          position: "top-right",
+        });
+      } else {
+        setLoginError(errorMessage);
+        toast({
+          title: "Error",
+          description: errorMessage,
+          status: "error",
+          duration: 5000,
+          isClosable: true,
+          position: "top-right",
+        });
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Función para probar con credenciales de ejemplo
+  const handleTestLogin = () => {
+    setEmail("admin@example.com");
+    setPassword("admin1234");
   };
 
   return (
@@ -105,6 +183,14 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSubmit }) => {
           Please enter your credentials
         </Text>
 
+        {/* Mostrar error general si existe */}
+        {loginError && (
+          <Alert status="error" mb={4} borderRadius="md">
+            <AlertIcon />
+            <AlertDescription>{loginError}</AlertDescription>
+          </Alert>
+        )}
+
         <form onSubmit={handleSubmit}>
           <VStack spacing={5}>
             <FormControl isInvalid={!!emailError} isRequired>
@@ -112,11 +198,12 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSubmit }) => {
               <Input
                 id="email"
                 type="email"
-                placeholder="Email"
+                placeholder="admin@example.com"
                 value={email}
                 onChange={(e) => {
                   setEmail(e.target.value);
                   if (emailError) setEmailError("");
+                  if (loginError) setLoginError(""); // Limpiar error de login
                 }}
                 bg="gray.50"
                 borderColor="gray.300"
@@ -125,6 +212,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSubmit }) => {
                   boxShadow: "0 0 0 1px #4CAF50",
                 }}
                 aria-describedby={emailError ? "email-error" : undefined}
+                disabled={isLoading}
               />
               <FormErrorMessage id="email-error">{emailError}</FormErrorMessage>
             </FormControl>
@@ -139,6 +227,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSubmit }) => {
                 onChange={(e) => {
                   setPassword(e.target.value);
                   if (passwordError) setPasswordError("");
+                  if (loginError) setLoginError(""); // Limpiar error de login
                 }}
                 bg="gray.50"
                 borderColor="gray.300"
@@ -147,6 +236,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSubmit }) => {
                   boxShadow: "0 0 0 1px #4CAF50",
                 }}
                 aria-describedby={passwordError ? "password-error" : undefined}
+                disabled={isLoading}
               />
               <FormErrorMessage id="password-error">
                 {passwordError}
@@ -159,8 +249,22 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSubmit }) => {
               size="lg"
               width="full"
               fontWeight="bold"
+              isLoading={isLoading}
+              loadingText="Iniciando sesión..."
+              disabled={isLoading}
             >
               Log in
+            </Button>
+
+            {/* Botón para pruebas (opcional - puedes removerlo en producción) */}
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleTestLogin}
+              disabled={isLoading}
+              colorScheme="gray"
+            >
+              Usar credenciales de prueba
             </Button>
           </VStack>
         </form>
@@ -173,11 +277,24 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSubmit }) => {
           <ModalHeader>Error de autenticación</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
-            Las credenciales ingresadas no son válidas. Por favor, verifica tu correo electrónico y contraseña.
+            <Text mb={3}>Las credenciales ingresadas no son válidas.</Text>
+            <Text fontSize="sm" color="gray.600">
+              Verifica que tu correo electrónico y contraseña sean correctos.
+              <br />
+              <br />
+              <strong>Credenciales de prueba:</strong>
+              <br />
+              Email: admin@example.com
+              <br />
+              Password: admin1234
+            </Text>
           </ModalBody>
           <ModalFooter>
             <Button colorScheme="red" mr={3} onClick={onClose}>
               Cerrar
+            </Button>
+            <Button variant="outline" onClick={() => { handleTestLogin(); onClose(); }}>
+              Usar credenciales de prueba
             </Button>
           </ModalFooter>
         </ModalContent>
